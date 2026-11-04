@@ -7,7 +7,7 @@ const OUT = 'data/videos.json';
 const UA = { 'User-Agent': 'Mozilla/5.0 (compatible; VaporInsideSite/1.0)', 'Accept-Language': 'it-IT,it;q=0.9' };
 
 async function channelId() {
-  if (process.env.YT_CHANNEL_ID) return process.env.YT_CHANNEL_ID;
+  return process.env.YT_CHANNEL_ID || 'UCox3leNQsPqJbHWtqmWoWAw';
   const html = await (await fetch(`https://www.youtube.com/@${HANDLE}`, { headers: UA })).text();
   const m = html.match(/"externalId":"(UC[\w-]{22})"/) || html.match(/channel_id=(UC[\w-]{22})/) || html.match(/"channelId":"(UC[\w-]{22})"/);
   if (!m) throw new Error('Channel ID non trovato');

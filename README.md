@@ -10,7 +10,5 @@ scaricando prima gli ultimi video del canale YouTube in `data/videos.json` (`scr
 
 Requisito una tantum: *Settings → Pages → Build and deployment → Source: **GitHub Actions***.
 
-Se lo script non trova automaticamente l'ID del canale, aggiungerlo in
-*Settings → Secrets and variables → Actions → Variables* come `YT_CHANNEL_ID` (es. `UCxxxx…`).
 
 I marchi del banner scorrevole si modificano nell'array `BRANDS` in `js/main.js`.
