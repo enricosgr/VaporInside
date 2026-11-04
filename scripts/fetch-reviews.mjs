@@ -4,13 +4,15 @@ import { writeFileSync, existsSync } from 'node:fs';
 
 const OUT = 'data/reviews.json';
 const KEY = process.env.GOOGLE_PLACES_API_KEY;
+// Se la chiave è limitata ai siti web (referrer), si dichiara il sito come provenienza.
+const REF = { Referer: process.env.SITE_URL || '' };
 const QUERY = 'Vapor Inside Castelfranco Veneto';
 
 async function placeId() {
   if (process.env.GOOGLE_PLACE_ID) return process.env.GOOGLE_PLACE_ID;
   const r = await fetch('https://places.googleapis.com/v1/places:searchText', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'X-Goog-Api-Key': KEY, 'X-Goog-FieldMask': 'places.id,places.displayName' },
+    headers: { ...REF, 'Content-Type': 'application/json', 'X-Goog-Api-Key': KEY, 'X-Goog-FieldMask': 'places.id,places.displayName' },
     body: JSON.stringify({ textQuery: QUERY, languageCode: 'it' }),
   });
   const j = await r.json();
@@ -24,7 +26,7 @@ try {
   const id = await placeId();
   const fields = 'id,displayName,rating,userRatingCount,reviews,googleMapsUri,formattedAddress,nationalPhoneNumber,regularOpeningHours.weekdayDescriptions';
   const r = await fetch(`https://places.googleapis.com/v1/places/${id}?languageCode=it`, {
-    headers: { 'X-Goog-Api-Key': KEY, 'X-Goog-FieldMask': fields },
+    headers: { ...REF, 'X-Goog-Api-Key': KEY, 'X-Goog-FieldMask': fields },
   });
   const p = await r.json();
   if (p.error) throw new Error(p.error.message);
