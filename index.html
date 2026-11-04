@@ -130,18 +130,39 @@
           <p>Prima di comprare, guardalo in azione. Sul canale trovi recensioni approfondite, confronti e dirette in cui rispondiamo alle vostre domande.</p>
         </div>
         <div class="yt reveal">
-          <a class="yt-frame yt-poster" href="https://www.youtube.com/@VaporInside/videos" target="_blank" rel="noopener" aria-label="Guarda gli ultimi video su YouTube">
-            <img src="assets/logo.png" alt="" width="160" height="160">
-            <span class="play" aria-hidden="true"></span>
-            <span class="yt-label">Guarda gli ultimi video</span>
-          </a>
+          <div class="yt-frame" id="ytPlayer">
+            <a class="yt-poster" href="https://www.youtube.com/@VaporInside/videos" target="_blank" rel="noopener" aria-label="Guarda gli ultimi video su YouTube">
+              <img src="assets/logo.png" alt="" width="160" height="160">
+              <span class="play" aria-hidden="true"></span>
+              <span class="yt-label">Guarda gli ultimi video</span>
+            </a>
+          </div>
           <div class="yt-side">
-            <h3>Iscriviti al canale</h3>
-            <p>Attiva la campanella per non perderti le prossime live e le nuove recensioni.</p>
+            <span class="badge" id="ytBadge" hidden>● Ultimo video</span>
+            <h3 id="ytTitle">Iscriviti al canale</h3>
+            <p id="ytDate">Attiva la campanella per non perderti le prossime live e le nuove recensioni.</p>
             <a href="https://www.youtube.com/@VaporInside?sub_confirmation=1" target="_blank" rel="noopener" class="btn btn-primary">Iscriviti su YouTube</a>
             <a href="https://www.youtube.com/@VaporInside/streams" target="_blank" rel="noopener" class="btn btn-ghost">Vedi le live</a>
           </div>
         </div>
+
+        <div class="carousel reveal" id="carousel" hidden>
+          <div class="carousel-head">
+            <h3>Altri video</h3>
+            <div class="carousel-nav">
+              <button type="button" class="cbtn" data-dir="-1" aria-label="Video precedenti">‹</button>
+              <button type="button" class="cbtn" data-dir="1" aria-label="Video successivi">›</button>
+            </div>
+          </div>
+          <ul class="track" id="track"></ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="brands" aria-label="Marchi trattati">
+      <p class="eyebrow">I marchi che trovi in negozio</p>
+      <div class="marquee">
+        <ul class="marquee-track" id="brandTrack"></ul>
       </div>
     </section>
 

@@ -38,3 +38,54 @@
 
   document.getElementById('year').textContent = new Date().getFullYear();
 })();
+
+// ---- Brand marquee ----
+(() => {
+  const BRANDS = ['Vaporesso', 'GeekVape', 'Voopoo', 'SMOK', 'Aspire', 'Eleaf', 'Innokin', 'Lost Vape', 'Uwell', 'Vandy Vape', 'Dovpo', 'Hellvape', 'Wotofo', 'Freemax', 'OXVA', 'Joyetech', 'Justfog', 'Steam Crave', 'BP Mods', 'Dotmod', 'Suprem-e', 'Flavourart', 'Dea Flavor', 'Azhad\'s Elixirs', 'Valkiria', 'Svapo Wave', 'Enjoy Svapo', 'La Tabaccheria', 'Vaporart', 'Seven Wonders', 'Blendfeel', 'TNT Vape', 'Clamour Vape', 'Angolo della Guancia'];
+  const track = document.getElementById('brandTrack');
+  const items = BRANDS.map((b) => `<li>${b}</li>`).join('');
+  track.innerHTML = items + items.replace(/<li>/g, '<li aria-hidden="true">'); // doppio per scorrimento continuo
+})();
+
+// ---- YouTube: ultimo video in evidenza + carosello ----
+(async () => {
+  let data;
+  try { data = await (await fetch('data/videos.json', { cache: 'no-cache' })).json(); } catch (e) { return; }
+  const videos = (data && data.videos) || [];
+  if (!videos.length) return;
+
+  const player = document.getElementById('ytPlayer');
+  const title = document.getElementById('ytTitle');
+  const date = document.getElementById('ytDate');
+  const badge = document.getElementById('ytBadge');
+  const fmt = (d) => new Date(d).toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' });
+  const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+  const show = (v, autoplay) => {
+    player.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${v.id}?rel=0${autoplay ? '&autoplay=1' : ''}" title="${esc(v.title)}" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+    title.textContent = v.title;
+    date.textContent = 'Pubblicato il ' + fmt(v.published);
+    badge.hidden = v !== videos[0];
+    document.querySelectorAll('.vcard').forEach((c) => c.setAttribute('aria-current', String(c.dataset.id === v.id)));
+  };
+
+  const track = document.getElementById('track');
+  track.innerHTML = videos.map((v) => `
+    <li><button type="button" class="vcard" data-id="${v.id}">
+      <span class="thumb"><img src="https://i.ytimg.com/vi/${v.id}/hqdefault.jpg" alt="" loading="lazy"></span>
+      <span class="vt">${esc(v.title)}</span>
+      <time datetime="${v.published}">${fmt(v.published)}</time>
+    </button></li>`).join('');
+  track.addEventListener('click', (e) => {
+    const c = e.target.closest('.vcard');
+    if (!c) return;
+    show(videos.find((v) => v.id === c.dataset.id), true);
+    player.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
+  document.querySelectorAll('.cbtn').forEach((b) => b.addEventListener('click', () => {
+    track.scrollBy({ left: Number(b.dataset.dir) * track.clientWidth * 0.9, behavior: 'smooth' });
+  }));
+
+  show(videos[0], false);
+  document.getElementById('carousel').hidden = videos.length < 2;
+})();
