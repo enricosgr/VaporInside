@@ -82,10 +82,67 @@
     show(videos.find((v) => v.id === c.dataset.id), true);
     player.scrollIntoView({ behavior: 'smooth', block: 'center' });
   });
-  document.querySelectorAll('.cbtn').forEach((b) => b.addEventListener('click', () => {
+  document.querySelectorAll('#carousel .cbtn').forEach((b) => b.addEventListener('click', () => {
     track.scrollBy({ left: Number(b.dataset.dir) * track.clientWidth * 0.9, behavior: 'smooth' });
   }));
 
   show(videos[0], false);
   document.getElementById('carousel').hidden = videos.length < 2;
+})();
+
+// ---- Recensioni Google + dati di contatto ----
+(async () => {
+  let g;
+  try { g = await (await fetch('data/reviews.json', { cache: 'no-cache' })).json(); } catch (e) { return; }
+  if (!g || !g.placeId) return;
+  const $ = (id) => document.getElementById(id);
+  const esc = (s = '') => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const stars = (r) => `<span class="stars" aria-label="${r} su 5"><span>★★★★★</span><span class="fill" style="width:${(r / 5) * 100}%">★★★★★</span></span>`;
+
+  if (g.rating) {
+    $('gRating').textContent = g.rating.toLocaleString('it-IT', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+    $('gStars').querySelector('.fill').style.width = (g.rating / 5) * 100 + '%';
+    $('gCount').textContent = `Media su ${g.count} recensioni`;
+  }
+  if (g.reviewUrl) $('gWrite').href = g.reviewUrl;
+  if (g.url) $('gAll').href = g.url;
+
+  // Contatti
+  if (g.address) $('cAddr').textContent = g.address;
+  if (g.phone) $('cPhone').innerHTML = `<a href="tel:${g.phone.replace(/\s/g, '')}">${esc(g.phone)}</a>`;
+  if (g.hours.length) $('cHours').innerHTML = '<ul class="hours">' + g.hours.map((h) => {
+    const [d, ...t] = h.split(': ');
+    return `<li><b>${esc(d)}</b><span>${esc(t.join(': '))}</span></li>`;
+  }).join('') + '</ul>';
+  $('cMap').src = `https://www.google.com/maps?q=place_id:${g.placeId}&output=embed`;
+
+  // Carosello
+  const list = (g.reviews || []).filter((r) => r.rating >= 4);
+  if (!list.length) return;
+  $('rTrack').innerHTML = list.map((r) => `
+    <li><article class="rcard">
+      <div class="rhead">
+        ${r.photo ? `<img src="${esc(r.photo)}" alt="" width="44" height="44" loading="lazy" referrerpolicy="no-referrer">` : `<span class="avatar">${esc((r.author || '?')[0])}</span>`}
+        <div><a href="${esc(r.authorUrl || g.url)}" target="_blank" rel="noopener" class="rname">${esc(r.author)}</a><small>${esc(r.when)}</small></div>
+      </div>
+      ${stars(r.rating)}
+      <p>${esc(r.text)}</p>
+    </article></li>`).join('');
+  $('rCarousel').hidden = false;
+  const track = $('rTrack');
+  document.querySelectorAll('#rCarousel .cbtn').forEach((b) => b.addEventListener('click', () => {
+    track.scrollBy({ left: Number(b.dataset.dir) * track.clientWidth * 0.9, behavior: 'smooth' });
+  }));
+  // scorrimento automatico, in pausa al passaggio del mouse
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    let pause = false;
+    track.addEventListener('mouseenter', () => (pause = true));
+    track.addEventListener('mouseleave', () => (pause = false));
+    track.addEventListener('touchstart', () => (pause = true), { passive: true });
+    setInterval(() => {
+      if (pause || document.hidden) return;
+      const end = track.scrollLeft + track.clientWidth >= track.scrollWidth - 5;
+      track.scrollTo({ left: end ? 0 : track.scrollLeft + track.firstElementChild.offsetWidth + 18, behavior: 'smooth' });
+    }, 5000);
+  }
 })();

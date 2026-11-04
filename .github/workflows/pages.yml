@@ -4,7 +4,7 @@ on:
   push:
     branches: [main, claude/dreamy-turing-8erkoo]
   schedule:
-    - cron: "17 */3 * * *"   # aggiorna i video ogni 3 ore
+    - cron: "17 */3 * * *"   # aggiorna video e recensioni ogni 3 ore
   workflow_dispatch:
 
 permissions:
@@ -31,6 +31,11 @@ jobs:
         run: node scripts/fetch-videos.mjs
         env:
           YT_CHANNEL_ID: ${{ vars.YT_CHANNEL_ID }}
+      - name: Scarica recensioni Google
+        run: node scripts/fetch-reviews.mjs
+        env:
+          GOOGLE_PLACES_API_KEY: ${{ secrets.GOOGLE_PLACES_API_KEY }}
+          GOOGLE_PLACE_ID: ${{ vars.GOOGLE_PLACE_ID }}
       - name: Prepara il sito
         run: |
           mkdir _site

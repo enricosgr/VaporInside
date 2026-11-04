@@ -12,3 +12,8 @@ Requisito una tantum: *Settings → Pages → Build and deployment → Source: *
 
 
 I marchi del banner scorrevole si modificano nell'array `BRANDS` in `js/main.js`.
+
+## Recensioni Google
+`scripts/fetch-reviews.mjs` scarica valutazione, recensioni (max 5, limite di Google), indirizzo, telefono e orari
+tramite Google Places API. Serve il secret `GOOGLE_PLACES_API_KEY`
+(*Settings → Secrets and variables → Actions → Secrets*). Facoltativa la variabile `GOOGLE_PLACE_ID`.
