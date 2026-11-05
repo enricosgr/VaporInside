@@ -114,7 +114,8 @@
     const [d, ...t] = h.split(': ');
     return `<li><b>${esc(d)}</b><span>${esc(t.join(': '))}</span></li>`;
   }).join('') + '</ul>';
-  $('cMap').src = `https://www.google.com/maps?q=place_id:${g.placeId}&output=embed`;
+  const q = encodeURIComponent([g.name || 'Vapor Inside', g.address || 'Castelfranco Veneto'].join(', '));
+  $('cMap').src = `https://www.google.com/maps?q=${q}&z=17&output=embed`;
 
   // Carosello
   const list = (g.reviews || []).filter((r) => r.rating >= 4);
