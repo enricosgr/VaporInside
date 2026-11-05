@@ -117,14 +117,18 @@
   const q = encodeURIComponent([g.name || 'Vapor Inside', g.address || 'Castelfranco Veneto'].join(', '));
   $('cMap').src = `https://www.google.com/maps?q=${q}&z=17&output=embed`;
 
-  // Carosello
-  const list = (g.reviews || []).filter((r) => r.rating >= 4);
+  // Carosello: recensioni Google, altrimenti quelle inserite a mano in data/reviews-manual.json
+  let reviews = g.reviews || [];
+  if (!reviews.length) {
+    try { reviews = (await (await fetch('data/reviews-manual.json', { cache: 'no-cache' })).json()).reviews || []; } catch (e) {}
+  }
+  const list = reviews.filter((r) => r.rating >= 4);
   if (!list.length) return;
   $('rTrack').innerHTML = list.map((r) => `
     <li><article class="rcard">
       <div class="rhead">
-        ${r.photo ? `<img src="${esc(r.photo)}" alt="" width="44" height="44" loading="lazy" referrerpolicy="no-referrer">` : `<span class="avatar">${esc((r.author || '?')[0])}</span>`}
-        <div><a href="${esc(r.authorUrl || g.url)}" target="_blank" rel="noopener" class="rname">${esc(r.author)}</a><small>${esc(r.when)}</small></div>
+        ${r.photo ? `<img src="${esc(r.photo)}" alt="" width="44" height="44" loading="lazy" referrerpolicy="no-referrer">` : `<span class="avatar">${esc((r.author || '?')[0].toUpperCase())}</span>`}
+        <div><a href="${esc(r.authorUrl || g.url)}" target="_blank" rel="noopener" class="rname">${esc(r.author)}</a><small>${esc(r.when || '')}</small></div>
       </div>
       ${stars(r.rating)}
       <p>${esc(r.text)}</p>
