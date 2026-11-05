@@ -31,7 +31,7 @@ jobs:
         run: node scripts/fetch-videos.mjs
         env:
           YT_CHANNEL_ID: ${{ vars.YT_CHANNEL_ID }}
-          GOOGLE_API_KEY: ${{ secrets.GOOGLE_PLACES_API_KEY }}
+          GOOGLE_API_KEY: ${{ secrets.YOUTUBE_API || secrets.GOOGLE_PLACES_API_KEY }}
           SITE_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/
       - name: Scarica recensioni Google
         run: node scripts/fetch-reviews.mjs
