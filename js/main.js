@@ -26,7 +26,19 @@
     document.body.style.overflow = open ? 'hidden' : '';
   };
   burger.addEventListener('click', () => setMenu(!menu.classList.contains('open')));
-  menu.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => setMenu(false)));
+  menu.querySelectorAll('a').forEach((a) => a.addEventListener('click', (e) => {
+    if (!menu.classList.contains('open')) return;
+    // breve animazione di "tocco" prima di chiudere e scorrere alla sezione
+    e.preventDefault();
+    a.classList.add('tapped');
+    const target = document.querySelector(a.getAttribute('href'));
+    setTimeout(() => {
+      a.classList.remove('tapped');
+      setMenu(false);
+      if (target) { target.scrollIntoView({ behavior: 'smooth' }); history.replaceState(null, '', a.getAttribute('href')); }
+    }, 380);
+  }));
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setMenu(false); });
 
   // Reveal on scroll
   const io = new IntersectionObserver((entries) => {
