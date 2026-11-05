@@ -9,7 +9,8 @@ const REF = { Referer: process.env.SITE_URL || '' };
 const QUERY = 'Vapor Inside Castelfranco Veneto';
 
 async function placeId() {
-  if (process.env.GOOGLE_PLACE_ID) return process.env.GOOGLE_PLACE_ID;
+  // ID della scheda Google di Vapor Inside (evita una ricerca a pagamento a ogni aggiornamento)
+  return process.env.GOOGLE_PLACE_ID || 'ChIJdYTGzTQpeUcR5GlUthfBDFI';
   const r = await fetch('https://places.googleapis.com/v1/places:searchText', {
     method: 'POST',
     headers: { ...REF, 'Content-Type': 'application/json', 'X-Goog-Api-Key': KEY, 'X-Goog-FieldMask': 'places.id,places.displayName' },
@@ -31,15 +32,6 @@ try {
   const p = await r.json();
   if (p.error) throw new Error(p.error.message);
   console.log(`Recensioni ricevute da Google: ${p.reviews?.length ?? 'nessun campo reviews'}`);
-  if (!p.reviews?.length) {
-    // riprova senza filtro lingua e con ordinamento per più recenti
-    const r2 = await fetch(`https://places.googleapis.com/v1/places/${id}`, {
-      headers: { ...REF, 'X-Goog-Api-Key': KEY, 'X-Goog-FieldMask': 'reviews' },
-    });
-    const p2 = await r2.json();
-    console.log(`Secondo tentativo: ${p2.reviews?.length ?? JSON.stringify(p2).slice(0, 300)}`);
-    if (p2.reviews?.length) p.reviews = p2.reviews;
-  }
   if (p.reviews?.[0]) console.log('Esempio campi recensione:', Object.keys(p.reviews[0]).join(', '));
   const out = {
     placeId: p.id,
